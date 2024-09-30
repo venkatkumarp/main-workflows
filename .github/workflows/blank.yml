@@ -3,14 +3,9 @@ name: "Path Testing Workflow"
 on:
   push:
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - edited
     paths:
-      - 'backend/**'
-      - 'frontend/**'
+      - 'backend/*'
+      - 'frontend/*'
 
 permissions:
   id-token: write
