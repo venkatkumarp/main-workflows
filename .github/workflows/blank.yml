@@ -1,4 +1,4 @@
-name: "Test: SonarQube Web Workflow"
+name: "Sonar: SonarQube Web"
 
 on:
   pull_request:
@@ -8,30 +8,36 @@ on:
       - './frontend/**'
   push:
     branches:
-      - main
+      - main  # or your default branch
     paths:
       - './backend/**'
       - './frontend/**'
+
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  Test-Sonar-Scan:
-    name: Test Workflow for SonarQube Configuration
+  Sonar-Scan-Backend:
+    name: SonarQube Scan for Backend Code  
+    if: contains(github.event.pull_request.changed_files, 'backend/') || github.event_name == 'push'
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Set environment and working directory
+      - name: Check for Backend Changes
         run: |
-          echo "Branch: ${{ github.head_ref }}"
-          echo "Environment: ${{ github.head_ref }}"
-          
-          WORKING_DIR="${{ github.event.pull_request.head.ref == 'backend' && 'backend' || 'frontend' }}"
-          echo "Working Directory: $WORKING_DIR"
+          echo "Running SonarQube scan for the backend..."
+          echo "Working Directory: ./backend"
+          # Simulate the SonarQube token usage
+          echo "Using SonarQube Token: SONAR_TOKEN_BACKEND"
 
-      - name: Simulate Sonar Scan (Dummy)
-        run: echo "This is where the SonarQube scan would happen with the given values."
+  Sonar-Scan-Frontend:
+    name: SonarQube Scan for Frontend Code  
+    if: contains(github.event.pull_request.changed_files, 'frontend/') || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for Frontend Changes
+        run: |
+          echo "Running SonarQube scan for the frontend..."
+          echo "Working Directory: ./frontend"
+          # Simulate the SonarQube token usage
+          echo "Using SonarQube Token: SONAR_TOKEN_FRONTEND"
