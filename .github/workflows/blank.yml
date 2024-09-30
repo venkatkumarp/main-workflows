@@ -20,7 +20,7 @@ permissions:
 jobs:
   Sonar-Scan-Backend:
     name: SonarQube Scan for Backend Code  
-    if: contains(github.event.pull_request.changed_files, 'backend/') && github.event_acyion != 'closed'
+    if: contains(github.event.pull_request.changed_files, 'backend/') && github.event_action != 'closed'
     runs-on: ubuntu-latest
     steps:
       - name: Check for Backend Changes
@@ -32,7 +32,7 @@ jobs:
 
   Sonar-Scan-Frontend:
     name: SonarQube Scan for Frontend Code  
-    if: contains(github.event.pull_request.changed_files, 'frontend/') || github.event_name == 'push'
+    if: contains(github.event.pull_request.changed_files, 'frontend/') && github.event_action != 'closed'
     runs-on: ubuntu-latest
     steps:
       - name: Check for Frontend Changes
