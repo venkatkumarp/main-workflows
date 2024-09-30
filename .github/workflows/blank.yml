@@ -23,8 +23,14 @@ jobs:
         run: |
           echo "Backend changes detected."
           echo "Working Directory: './backend'"
-
+    if: contains(github.event.pull_request.changed_files, 'backend/')
+    
+  check_frontend:
+    name: frontend
+    runs-on: ubuntu-latest
+    steps:
       - name: Echo Frontend Working Directory
         run: |
           echo "Frontend changes detected."
           echo "Working Directory: './frontend'"
+    if: contains(github.event.pull_request.changed_files, 'frontend/')
