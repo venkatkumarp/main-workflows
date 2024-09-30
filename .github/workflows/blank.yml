@@ -19,6 +19,9 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+      - name: Debug Changed Files
+        run: |
+          echo "Changed files: ${{ toJson(github.event.pull_request.changed_files) }}"
 
       - name: Echo Backend Working Directory
         if: contains(github.event.pull_request.changed_files, 'backend/')
