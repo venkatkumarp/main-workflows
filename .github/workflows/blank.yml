@@ -7,6 +7,7 @@ on:
       - synchronize
       - reopened
       - edited
+
 permissions:
   id-token: write
   contents: read
@@ -18,19 +19,15 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
-        
+
       - name: Echo Backend Working Directory
+        if: contains(github.event.pull_request.changed_files, 'backend/')
         run: |
           echo "Backend changes detected."
           echo "Working Directory: './backend'"
-    if: contains(github.event.pull_request.changed_files, 'backend/')
-    
-  check_frontend:
-    name: frontend
-    runs-on: ubuntu-latest
-    steps:
+
       - name: Echo Frontend Working Directory
+        if: contains(github.event.pull_request.changed_files, 'frontend/')
         run: |
           echo "Frontend changes detected."
           echo "Working Directory: './frontend'"
-    if: contains(github.event.pull_request.changed_files, 'frontend/')
