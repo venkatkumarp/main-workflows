@@ -16,26 +16,14 @@ permissions:
   contents: read
 
 jobs:
-  Test-Paths:
-    name: Check Changed Files
+  Backend-Test:
+    name: Backend Test
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.changed_files, 'backend/') # Job-level condition
     steps:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Debug Changed Files
-        id: debug
-        run: |
-          echo "Changed files in PR:"
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          echo "changed_files=${CHANGED_FILES}" >> $GITHUB_ENV
-
-  Backend-Test:
-    name: Backend Test
-    runs-on: ubuntu-latest
-    needs: Test-Paths
-    if: contains(env.changed_files, 'backend/')
-    steps:
       - name: Echo Backend Working Directory
         run: |
           echo "Backend changes detected."
@@ -44,17 +32,12 @@ jobs:
   Frontend-Test:
     name: Frontend Test
     runs-on: ubuntu-latest
-    needs: Test-Paths
-    if: contains(env.changed_files, 'frontend/')
+    if: contains(github.event.pull_request.changed_files, 'frontend/') # Job-level condition
     steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
       - name: Echo Frontend Working Directory
         run: |
           echo "Frontend changes detected."
           echo "Working Directory: './frontend'"
-
-  Complete:
-    runs-on: ubuntu-latest
-    needs: [Backend-Test, Frontend-Test]
-    steps:
-      - name: Final Completion Step
-        run: echo "Job complete."
