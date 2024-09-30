@@ -6,12 +6,6 @@ on:
     paths:
       - './backend/**'
       - './frontend/**'
-  push:
-    branches:
-      - main  # or your default branch
-    paths:
-      - './backend/**'
-      - './frontend/**'
 
 permissions:
   id-token: write
