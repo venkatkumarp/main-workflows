@@ -1,7 +1,6 @@
 name: "Path Testing Workflow"
 
 on:
-  push:
   pull_request:
     paths:
       - 'backend/*'
