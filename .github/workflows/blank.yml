@@ -1,7 +1,15 @@
 name: "Path Testing Workflow"
 
 on:
-  workflow_dispatch:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   Test-Paths:
@@ -12,13 +20,11 @@ jobs:
         uses: actions/checkout@v3
         
       - name: Echo Backend Working Directory
-        if: github.event.pull_request.changed_files > 0 && contains(github.event.pull_request.changed_files, 'backend')
         run: |
           echo "Backend changes detected."
           echo "Working Directory: './backend'"
 
       - name: Echo Frontend Working Directory
-        if: github.event.pull_request.changed_files > 0 && contains(github.event.pull_request.changed_files, 'frontend')
         run: |
           echo "Frontend changes detected."
           echo "Working Directory: './frontend'"
