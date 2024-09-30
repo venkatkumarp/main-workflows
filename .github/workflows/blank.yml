@@ -8,8 +8,8 @@ on:
       - reopened
       - edited
     paths:
-      - 'backend/**'
-      - 'frontend/**'
+      - "backend/**"      # Trigger on changes in the backend directory
+      - "frontend/**"     # Trigger on changes in the frontend directory
 
 permissions:
   id-token: write
@@ -19,15 +19,17 @@ jobs:
   Backend-Test:
     name: Backend Test
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.changed_files, 'backend/')
     steps:
       - name: Check out code
         uses: actions/checkout@v3
 
       - name: Echo Changed Files
-        run: echo "Changed files: ${{ toJson(github.event.pull_request.changed_files) }}"
+        run: |
+          echo "Changed files in PR:"
+          echo "${{ toJson(github.event.pull_request.changed_files) }}"
 
       - name: Echo Backend Working Directory
+        if: contains(github.event.pull_request.changed_files, 'backend/')
         run: |
           echo "Backend changes detected."
           echo "Working Directory: './backend'"
@@ -35,15 +37,17 @@ jobs:
   Frontend-Test:
     name: Frontend Test
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.changed_files, 'frontend/')
     steps:
       - name: Check out code
         uses: actions/checkout@v3
 
       - name: Echo Changed Files
-        run: echo "Changed files: ${{ toJson(github.event.pull_request.changed_files) }}"
+        run: |
+          echo "Changed files in PR:"
+          echo "${{ toJson(github.event.pull_request.changed_files) }}"
 
       - name: Echo Frontend Working Directory
+        if: contains(github.event.pull_request.changed_files, 'frontend/')
         run: |
           echo "Frontend changes detected."
           echo "Working Directory: './frontend'"
