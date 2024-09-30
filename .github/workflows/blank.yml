@@ -1,0 +1,28 @@
+name: "Path Testing Workflow"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - './backend/**'
+      - './frontend/**'
+
+jobs:
+  Test-Paths:
+    name: Test Paths for Backend and Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        
+      - name: Echo Backend Working Directory
+        if: github.event.pull_request.changed_files > 0 && contains(github.event.pull_request.changed_files, 'backend')
+        run: |
+          echo "Backend changes detected."
+          echo "Working Directory: './backend'"
+
+      - name: Echo Frontend Working Directory
+        if: github.event.pull_request.changed_files > 0 && contains(github.event.pull_request.changed_files, 'frontend')
+        run: |
+          echo "Frontend changes detected."
+          echo "Working Directory: './frontend'"
