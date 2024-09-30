@@ -25,16 +25,17 @@ jobs:
 
       - name: Debug Changed Files
         run: |
-          echo "Changed files in PR: ${{ toJson(github.event.pull_request.files) }}"
+          echo "Changed files in PR:"
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
 
       - name: Echo Backend Working Directory
-        if: contains(join(github.event.pull_request.files.*.filename, ','), 'backend/')
+        if: contains(git diff --name-only ${{ github.event.before }} ${{ github.sha }}, 'backend/')
         run: |
           echo "Backend changes detected."
           echo "Working Directory: './backend'"
 
       - name: Echo Frontend Working Directory
-        if: contains(join(github.event.pull_request.files.*.filename, ','), 'frontend/')
+        if: contains(git diff --name-only ${{ github.event.before }} ${{ github.sha }}, 'frontend/')
         run: |
           echo "Frontend changes detected."
           echo "Working Directory: './frontend'"
