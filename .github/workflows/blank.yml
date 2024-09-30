@@ -6,7 +6,12 @@ on:
     paths:
       - './backend/**'
       - './frontend/**'
-
+  push:
+    branches:
+      - main
+    paths:
+      - './backend/**'
+      - './frontend/**'
 permissions:
   id-token: write
   contents: read
