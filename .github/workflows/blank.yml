@@ -1,8 +1,9 @@
 name: "Path Testing Workflow"
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
     paths:
       - './backend/**'
       - './frontend/**'
