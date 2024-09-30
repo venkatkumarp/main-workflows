@@ -1,16 +1,7 @@
 name: "Path Testing Workflow"
 
 on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - edited
-      - closed
-    paths:
-      - './backend/**'
-      - './frontend/**'
+  workflow_dispatch:
 
 jobs:
   Test-Paths:
