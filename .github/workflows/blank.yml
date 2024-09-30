@@ -28,16 +28,17 @@ jobs:
         run: |
           echo "Changed files in PR:"
           git diff --name-only ${{ github.event.before }} ${{ github.sha }} || true
-          echo "::set-output name=changed_files::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})"
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          echo "changed_files=${CHANGED_FILES}" >> $GITHUB_ENV
 
       - name: Echo Backend Working Directory
-        if: contains(steps.debug.outputs.changed_files, 'backend/')
+        if: contains(env.changed_files, 'backend/')
         run: |
           echo "Backend changes detected."
           echo "Working Directory: './backend'"
 
       - name: Echo Frontend Working Directory
-        if: contains(steps.debug.outputs.changed_files, 'frontend/')
+        if: contains(env.changed_files, 'frontend/')
         run: |
           echo "Frontend changes detected."
           echo "Working Directory: './frontend'"
