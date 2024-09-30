@@ -7,6 +7,9 @@ on:
       - synchronize
       - reopened
       - edited
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
 
 permissions:
   id-token: write
@@ -19,18 +22,19 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+
       - name: Debug Changed Files
         run: |
-          echo "Changed files: ${{ toJson(github.event.pull_request.changed_files) }}"
+          echo "Changed files in PR: ${{ toJson(github.event.pull_request.files) }}"
 
       - name: Echo Backend Working Directory
-        if: contains(github.event.pull_request.changed_files, 'backend/')
+        if: contains(join(github.event.pull_request.files.*.filename, ','), 'backend/')
         run: |
           echo "Backend changes detected."
           echo "Working Directory: './backend'"
 
       - name: Echo Frontend Working Directory
-        if: contains(github.event.pull_request.changed_files, 'frontend/')
+        if: contains(join(github.event.pull_request.files.*.filename, ','), 'frontend/')
         run: |
           echo "Frontend changes detected."
           echo "Working Directory: './frontend'"
