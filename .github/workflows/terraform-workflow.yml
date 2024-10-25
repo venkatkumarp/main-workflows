@@ -1,0 +1,104 @@
+name: "Terraform Deploy"
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+      working_dir:
+        required: true
+        type: string
+
+      backend_config_path:
+        required: true
+        type: string
+
+      backend_key:
+        required: true
+        type: string
+
+      plan_only:
+        required: false
+        default: true
+        type: boolean
+      
+      destroy:
+        required: false
+        default: false
+        type: boolean
+    
+    secrets:
+      org_repos_internal_read_only:
+        required: false
+
+      aws_oidc_assume_role:
+        required: false
+
+      tf_env_vars:
+        required: false
+
+env:
+  AWS_OIDC_ASSUME_ROLE: ${{ secrets.aws_oidc_assume_role }}
+  AWS_DEFAUL_REGION: us-east-1
+  TF_ENV_VARS: ${{ secrets.tf_env_vars }}
+
+jobs:
+  terraform_deploy:
+    name: Terraform Deploy
+    environment: ${{ inputs.environment }}
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout git repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Configure git
+        run: |
+          git config --global url."https://token:${{ secrets.org_repos_internal_read_only }}@github.com/bayer-int".insteadOf https://github.com/bayer-int
+          git config --global init.defaultBranch main
+
+      - name: Configure AWS Credentials
+        if:  ${{ env.AWS_OIDC_ASSUME_ROLE }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_OIDC_ASSUME_ROLE }}
+          aws-region: ${{ env.AWS_DEFAUL_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        env:
+          NODE_OPTIONS: --no-deprecation
+        with:
+          terraform_version: "1.7.5"
+
+      - name: terraform format
+        run: terraform fmt
+
+      - name: Set Terraform environment variables
+        if: ${{ env.TF_ENV_VARS }}
+        run: ${{ env.TF_ENV_VARS }}
+
+      - name: Copy Backend File
+        run: cp ${{ inputs.backend_config_path }} ${{ inputs.working_dir }}
+
+      - name: terraform init 
+        run: terraform -chdir=${{ inputs.working_dir }} init -reconfigure -backend-config="${{ inputs.environment }}.tfbackend" -backend-config="key=${{ inputs.backend_key }}"
+
+      - name: terraform validate
+        run: terraform -chdir=${{ inputs.working_dir }} validate
+
+      - name: terraform plan
+        run: terraform -chdir=${{ inputs.working_dir }} plan -out ${{ inputs.environment }}_deployment.tfplan
+      
+      - name: terraform apply
+        if: ${{ !inputs.plan_only }}
+        run: terraform -chdir=${{ inputs.working_dir }} apply -auto-approve -input=false
