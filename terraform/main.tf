@@ -46,7 +46,7 @@ data "archive_file" "lambda_zip" {
 }*/
 
 # Fetch the S3 object (you may need to loop over files if it's a directory)
-data "aws_s3_bucket_object" "lambda_code" {
+data "aws_s3_bucket_objects" "lambda_code" {
   bucket = "dev-ttm"
   key    = "dist/*"  # Adjust to point to your dist folder
 }
