@@ -1,0 +1,39 @@
+name: Terraform CI/CD
+
+on:
+  workflow_call: # This makes the workflow reusable
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Terraform
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.5.0' # Specify the Terraform version you want
+
+      # Step 3: Configure AWS Credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: 'us-east-1' # Specify your AWS region
+
+      # Step 4: Initialize Terraform
+      - name: Terraform Init
+        run: terraform init
+
+      # Step 5: Plan Terraform
+      - name: Terraform Plan
+        run: terraform plan
+
+      # Step 6: Apply Terraform changes
+      - name: Terraform Apply
+        run: terraform apply -auto-approve 
