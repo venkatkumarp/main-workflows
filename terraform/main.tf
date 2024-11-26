@@ -43,7 +43,7 @@ data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "/tmp/lambda-code"   # Ensure this points to the lambda_code directory
   output_path = "/tmp/lambda-code.zip"
-}*/
+}
 
 # Fetch the S3 object (you may need to loop over files if it's a directory)
 data "aws_s3_bucket_objects" "lambda_code" {
@@ -56,6 +56,23 @@ data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "/tmp/lambda-code"  # Directory where you download the files from S3
   output_path = "/tmp/lambda-code.zip"
+}*/
+
+# Use local-exec provisioner to download files from S3 into a directory
+resource "null_resource" "download_lambda_code" {
+  provisioner "local-exec" {
+    command = <<EOT
+      mkdir -p ./lambda-code
+      aws s3 cp s3://tftest8/dist/ ./lambda-code/ --recursive
+    EOT
+  }
+}
+
+# Use archive_file to zip the lambda code
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_dir  = "./lambda-code"  # Directory where you downloaded the files from S3
+  output_path = "./lambda-code.zip"  # The resulting zip file
 }
 
 # IAM role for Lambda execution
