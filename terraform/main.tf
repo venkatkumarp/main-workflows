@@ -78,7 +78,7 @@ data "archive_file" "lambda_zip" {
 
 # IAM role for Lambda execution
 resource "aws_iam_role" "lambda_execution_role" {
-  name = "tests3_execution_role"
+  name = "tests33_execution_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
