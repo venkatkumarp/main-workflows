@@ -17,6 +17,10 @@ resource "null_resource" "merge_lambda_code" {
       mkdir -p /tmp/lambda-code
       cp -r /tmp/app-repo/* /tmp/lambda-code/
       cp -r /tmp/infra-repo/* /tmp/lambda-code/
+      echo "Contents of /tmp/lambda-code:"
+      ls -la /tmp/lambda-code  # List the contents of the directory
+
+
     EOT
   }
 }
