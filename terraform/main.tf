@@ -62,7 +62,7 @@ data "archive_file" "lambda_zip" {
 resource "null_resource" "download_lambda_code" {
   provisioner "local-exec" {
     command = <<EOT
-      mkdir -p ./lambda-code
+      mkdir -p /tmp/lambda-code
       aws s3 cp s3://tftest8/dist/ ./lambda-code/ --recursive
     EOT
   }
@@ -70,9 +70,10 @@ resource "null_resource" "download_lambda_code" {
 
 # Use archive_file to zip the lambda code
 data "archive_file" "lambda_zip" {
+  depends_on = [null_resource.download_lambda_code]
   type        = "zip"
-  source_dir  = "./lambda-code"  # Directory where you downloaded the files from S3
-  output_path = "./lambda-code.zip"  # The resulting zip file
+  source_dir  = "/tmp/lambda-code"  # Directory where you downloaded the files from S3
+  output_path = "/tmp/lambda-code.zip"  # The resulting zip file
 }
 
 # IAM role for Lambda execution
