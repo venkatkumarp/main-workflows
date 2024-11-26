@@ -1,7 +1,7 @@
 name: Terraform CI/CD
 
 on:
-  workflow_call:
+  workflow_dispatch:
     secrets:
       AWS_ACCESS_KEY_ID:
         description: 'AWS Access Key ID'
