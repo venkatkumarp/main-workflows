@@ -38,6 +38,7 @@ jobs:
       # Step 4: Initialize Terraform
       - name: Terraform Init
         run: terraform init
+        working-directory: ./terraform
 
 
       # Step 5: Plan Terraform
