@@ -63,7 +63,7 @@ resource "null_resource" "download_lambda_code" {
   provisioner "local-exec" {
     command = <<EOT
       mkdir -p /tmp/lambda-code
-      aws s3 cp s3://tftest8/dist/ ./lambda-code/ --recursive
+      aws s3 cp s3://tftest8/dist/ /tmp/lambda-code/ --recursive
     EOT
   }
 }
