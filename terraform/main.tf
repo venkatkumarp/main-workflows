@@ -1,18 +1,32 @@
-# Fetch Lambda code files directly using git
-resource "null_resource" "fetch_lambda_code" {
+# Clone the repository with Lambda code
+resource "null_resource" "clone_lambda_code" {
   provisioner "local-exec" {
     command = <<EOT
-      mkdir -p ${path.module}/lambda_code
       git clone --branch main https://github.com/venkatkumarp/main-web.git ${path.module}/lambda_code
     EOT
   }
 }
 
-# Create a ZIP archive for the Lambda function code, but wait for the fetch_lambda_code resource
+# Merge Lambda code (if you want to merge multiple repositories)
+# This step is optional and can be used if you need to combine Lambda code from multiple sources.
+resource "null_resource" "merge_lambda_code" {
+  depends_on = [null_resource.clone_lambda_code]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      mkdir -p ${path.module}/lambda_code_merged
+      cp -r ${path.module}/lambda_code/* ${path.module}/lambda_code_merged/
+      # Optionally, merge from another repo or source here.
+    EOT
+  }
+}
+
+# Create a ZIP file of the Lambda code
 data "archive_file" "lambda_zip" {
-  depends_on = [null_resource.fetch_lambda_code]  # Ensure fetch_lambda_code runs first
+  depends_on = [null_resource.merge_lambda_code]  # Ensure the merging happens before creating the archive
+
   type        = "zip"
-  source_dir  = "${path.module}/lambda_code"  # Entire folder will be zipped
+  source_dir  = "${path.module}/lambda_code_merged"  # The merged code directory
   output_path = "${path.module}/lambda_function.zip"
 }
 
