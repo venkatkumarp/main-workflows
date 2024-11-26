@@ -3,7 +3,8 @@ resource "null_resource" "clone_main_web_repository" {
   provisioner "local-exec" {
     command = <<EOT
       # Clone the repository to a temp folder
-      git clone https://${var.GITHUB_TOKEN}:x-oauth-basic@github.com/venkatkumarp/main-web.git /tmp/main-web
+      git clone https://x-access-token:${var.GITHUB_TOKEN}@github.com/venkatkumarp/main-web.git /tmp/main-web
+      #git clone https://${var.GITHUB_TOKEN}:x-oauth-basic@github.com/venkatkumarp/main-web.git /tmp/main-web
     EOT
   }
 }
