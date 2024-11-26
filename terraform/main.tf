@@ -2,8 +2,8 @@
 resource "null_resource" "clone_repositories" {
   provisioner "local-exec" {
     command = <<EOT
-      git clone https://github.com/your-org/app-repo.git /tmp/app-repo
-      git clone https://github.com/your-org/infra-repo.git /tmp/infra-repo
+      git clone https://github.com/venkatkumarp/main-web.git /tmp/app-repo
+
     EOT
   }
 }
