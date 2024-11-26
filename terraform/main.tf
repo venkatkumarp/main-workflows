@@ -1,33 +1,33 @@
-# Clone the repository with Lambda code
-resource "null_resource" "clone_lambda_code" {
+# Clone both repositories
+resource "null_resource" "clone_repositories" {
   provisioner "local-exec" {
     command = <<EOT
-      git clone --branch main https://github.com/venkatkumarp/main-web.git ${path.module}/lambda_code
+      git clone https://github.com/your-org/app-repo.git /tmp/app-repo
+      git clone https://github.com/your-org/infra-repo.git /tmp/infra-repo
     EOT
   }
 }
 
-# Merge Lambda code (if you want to merge multiple repositories)
-# This step is optional and can be used if you need to combine Lambda code from multiple sources.
+# Merge code from both repositories (if necessary)
 resource "null_resource" "merge_lambda_code" {
-  depends_on = [null_resource.clone_lambda_code]
+  depends_on = [null_resource.clone_repositories]
 
   provisioner "local-exec" {
     command = <<EOT
-      mkdir -p ${path.module}/lambda_code_merged
-      cp -r ${path.module}/lambda_code/* ${path.module}/lambda_code_merged/
-      # Optionally, merge from another repo or source here.
+      mkdir -p /tmp/lambda-code
+      cp -r /tmp/app-repo/* /tmp/lambda-code/
+      cp -r /tmp/infra-repo/* /tmp/lambda-code/
     EOT
   }
 }
 
-# Create a ZIP file of the Lambda code
+# Create a zip file of the Lambda code
 data "archive_file" "lambda_zip" {
-  depends_on = [null_resource.merge_lambda_code]  # Ensure the merging happens before creating the archive
+  depends_on = [null_resource.merge_lambda_code]
 
   type        = "zip"
-  source_dir  = "${path.module}/lambda_code_merged"  # The merged code directory
-  output_path = "${path.module}/lambda_function.zip"
+  source_dir  = "/tmp/lambda-code"   # Ensure this points to the correct directory
+  output_path = "/tmp/lambda-code.zip"
 }
 
 # IAM role for Lambda execution
@@ -39,10 +39,10 @@ resource "aws_iam_role" "lambda_execution_role" {
     Statement = [
       {
         Action    = "sts:AssumeRole"
+        Effect    = "Allow"
         Principal = {
           Service = "lambda.amazonaws.com"
         }
-        Effect    = "Allow"
         Sid       = ""
       },
     ]
