@@ -40,11 +40,11 @@ variable "repo_base_url" {
 resource "null_resource" "fetch_lambda_code" {
   provisioner "local-exec" {
     command = <<EOT
-      mkdir -p ${path.module}/lambda_code
-      curl -o ${path.module}/lambda_code/index.js ${var.repo_base_url}/index.js
+      git clone --branch main https://github.com/venkatkumarp/main-web.git ${path.module}/lambda_code
     EOT
   }
 }
+
 
 # Create a ZIP archive for the Lambda function code
 data "archive_file" "lambda_zip" {
