@@ -38,11 +38,14 @@ jobs:
       # Step 4: Initialize Terraform
       - name: Terraform Init
         run: terraform init
+        working-directory: ./terraform
 
       # Step 5: Plan Terraform
       - name: Terraform Plan
         run: terraform plan
+        working-directory: ./terraform
 
       # Step 6: Apply Terraform changes
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        working-directory: ./terraform
