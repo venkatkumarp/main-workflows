@@ -1,5 +1,5 @@
 # Clone the main-web repository (this contains the lambda_code folder)
-resource "null_resource" "clone_main_web_repository" {
+/*resource "null_resource" "clone_main_web_repository" {
   provisioner "local-exec" {
     command = <<EOT
       # Clone the repository to a temp folder
@@ -43,11 +43,24 @@ data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "/tmp/lambda-code"   # Ensure this points to the lambda_code directory
   output_path = "/tmp/lambda-code.zip"
+}*/
+
+# Fetch the S3 object (you may need to loop over files if it's a directory)
+data "aws_s3_bucket_object" "lambda_code" {
+  bucket = "dev-ttm"
+  key    = "dist/*"  # Adjust to point to your dist folder
+}
+
+# Use archive_file to zip the lambda code
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_dir  = "/tmp/lambda-code"  # Directory where you download the files from S3
+  output_path = "/tmp/lambda-code.zip"
 }
 
 # IAM role for Lambda execution
 resource "aws_iam_role" "lambda_execution_role" {
-  name = "testgit_execution_role"
+  name = "tests3_execution_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
