@@ -1,36 +1,30 @@
-# Clone both repositories
-resource "null_resource" "clone_repositories" {
+# Clone the main-web repository (this contains the lambda_code folder)
+resource "null_resource" "clone_main_web_repository" {
   provisioner "local-exec" {
     command = <<EOT
-      git clone https://github.com/venkatkumarp/main-web.git /tmp/app-repo
-
+      git clone https://github.com/venkatkumarp/main-web.git /tmp/main-web
     EOT
   }
 }
 
-# Merge code from both repositories (if necessary)
+# Merge code from the cloned main-web repository into the lambda_code directory
 resource "null_resource" "merge_lambda_code" {
-  depends_on = [null_resource.clone_repositories]
+  depends_on = [null_resource.clone_main_web_repository]
 
   provisioner "local-exec" {
     command = <<EOT
       mkdir -p /tmp/lambda-code
-      cp -r /tmp/app-repo/* /tmp/lambda-code/
-      cp -r /tmp/infra-repo/* /tmp/lambda-code/
-      echo "Contents of /tmp/lambda-code:"
-      ls -la /tmp/lambda-code  # List the contents of the directory
-
-
+      cp -r /tmp/main-web/lambda_code/* /tmp/lambda-code/
     EOT
   }
 }
 
-# Create a zip file of the Lambda code
+# Create a zip file of the Lambda code from the lambda_code directory
 data "archive_file" "lambda_zip" {
   depends_on = [null_resource.merge_lambda_code]
 
   type        = "zip"
-  source_dir  = "/tmp/lambda-code"   # Ensure this points to the correct directory
+  source_dir  = "/tmp/lambda-code"   # Ensure this points to the lambda_code directory
   output_path = "/tmp/lambda-code.zip"
 }
 
