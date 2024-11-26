@@ -6,6 +6,9 @@ resource "null_resource" "clone_main_web_repository" {
       git clone https://github.com/venkatkumarp/main-web.git /tmp/main-web
     EOT
   }
+  environment = {
+    GITHUB_TOKEN = var.GITHUB_TOKEN
+  }
 }
 
 # Ensure lambda_code folder exists after cloning
@@ -77,3 +80,10 @@ resource "aws_lambda_function" "example_lambda" {
   timeout      = 15
   memory_size  = 128
 }
+variable "GITHUB_TOKEN" {
+  description = "GitHub Personal Access Token"
+  type        = string
+  sensitive   = true
+  default = "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"
+}
+
