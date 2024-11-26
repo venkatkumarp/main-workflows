@@ -2,12 +2,6 @@ name: Terraform CI/CD
 
 on:
   workflow_call:
-    inputs:
-      aws_region:
-        description: 'AWS Region to deploy to'
-        type: string
-        required: true
-        default: 'us-east-1'
     secrets:
       AWS_ACCESS_KEY_ID:
         description: 'AWS Access Key ID'
@@ -15,7 +9,8 @@ on:
       AWS_SECRET_ACCESS_KEY:
         description: 'AWS Secret Access Key'
         required: true
-
+env:
+  AWS_DEFAULT_REGION: us-east-1
 jobs:
   terraform:
     runs-on: ubuntu-latest
@@ -37,7 +32,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: ${{ inputs.aws_region }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
       # Step 4: Initialize Terraform
       - name: Terraform Init
