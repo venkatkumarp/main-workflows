@@ -2,14 +2,30 @@
 resource "null_resource" "clone_main_web_repository" {
   provisioner "local-exec" {
     command = <<EOT
+      # Clone the repository to a temp folder
       git clone https://github.com/venkatkumarp/main-web.git /tmp/main-web
+    EOT
+  }
+}
+
+# Ensure lambda_code folder exists after cloning
+resource "null_resource" "check_lambda_code" {
+  depends_on = [null_resource.clone_main_web_repository]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      # Verify the lambda_code folder exists
+      if [ ! -d "/tmp/main-web/lambda_code" ]; then
+        echo "lambda_code directory not found!"
+        exit 1
+      fi
     EOT
   }
 }
 
 # Merge code from the cloned main-web repository into the lambda_code directory
 resource "null_resource" "merge_lambda_code" {
-  depends_on = [null_resource.clone_main_web_repository]
+  depends_on = [null_resource.check_lambda_code]
 
   provisioner "local-exec" {
     command = <<EOT
