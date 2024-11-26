@@ -19,11 +19,28 @@ provider "aws" {
   region = "us-east-1" # Specify your AWS region
 }
 
+# Variable for repository details
+variable "repo_base_url" {
+  description = "Base URL of the GitHub repository"
+  type        = string
+  default     = "https://raw.githubusercontent.com/venkatkumarp/main-web/main/lambda_code" # Path to the lambda_code folder
+}
+
+# Fetch Lambda code files directly
+resource "null_resource" "fetch_lambda_code" {
+  provisioner "local-exec" {
+    command = <<EOT
+      mkdir -p ${path.module}/lambda_code
+      curl -o ${path.module}/lambda_code/index.js ${var.repo_base_url}/index.js
+    EOT
+  }
+}
+
 # Create a ZIP archive for the Lambda function code
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "../phd-web/lambda_code"  # Path to the Lambda function code directory
-  output_path = "${path.module}/lambda_function.zip" # Path to output the zip file
+  source_dir  = "${path.module}/lambda_code"  # Entire folder will be zipped
+  output_path = "${path.module}/lambda_function.zip"
 }
 
 # IAM role for Lambda execution
