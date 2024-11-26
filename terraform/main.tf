@@ -92,9 +92,9 @@ resource "aws_lambda_function" "example_lambda" {
   memory_size  = 128
 }
 
-variable "GITHUB_TOKEN" {
+/*variable "GITHUB_TOKEN" {
   description = "GitHub Personal Access Token"
   type        = string
   sensitive   = true
   default = "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"
-}
+}*/
