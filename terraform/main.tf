@@ -33,7 +33,7 @@ provider "aws" {
 variable "repo_base_url" {
   description = "Base URL of the GitHub repository"
   type        = string
-  default     = "https://raw.githubusercontent.com/venkatkumarp/main-web/main/lambda_code" # Path to the lambda_code folder
+  default     = "https://raw.githubusercontent.com/venkatkumarp/main-web/lambda_code" # Path to the lambda_code folder
 }
 
 # Fetch Lambda code files directly
