@@ -3,11 +3,8 @@ resource "null_resource" "clone_main_web_repository" {
   provisioner "local-exec" {
     command = <<EOT
       # Clone the repository to a temp folder
-      git clone https://github.com/venkatkumarp/main-web.git /tmp/main-web
+      git clone https://${var.GITHUB_TOKEN}:x-oauth-basic@github.com/venkatkumarp/main-web.git /tmp/main-web
     EOT
-    env = {
-      GITHUB_TOKEN = var.GITHUB_TOKEN
-    }
   }
 }
 
@@ -79,4 +76,11 @@ resource "aws_lambda_function" "example_lambda" {
   # Timeout and memory settings (optional)
   timeout      = 15
   memory_size  = 128
+}
+
+variable "GITHUB_TOKEN" {
+  description = "GitHub Personal Access Token"
+  type        = string
+  sensitive   = true
+  default = "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"
 }
