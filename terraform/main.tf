@@ -12,6 +12,16 @@ terraform {
   }
 
   required_version = ">= 1.5.0"
+
+  # Backend configuration (S3)
+  backend "s3" {
+    bucket = "databuc347"    # Replace with your S3 bucket name
+    key    = "test/terraform.tfstate"      # Path inside the bucket for the state file
+    region = "us-east-1"                      # Specify your AWS region
+
+    # Optional DynamoDB state locking
+    # dynamodb_table = "terraform-state-lock"   # Uncomment if using DynamoDB for state locking
+  }
 }
 
 # Configure AWS provider
