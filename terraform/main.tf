@@ -17,7 +17,7 @@ terraform {
     bucket         = "tftest8"
     key            = "path/test/terraform.tfstate" # Path to the state file in the bucket
     region         = "us-east-1" # Replace with your bucket's region
-    #encrypt        = true        # Encrypt state file at rest (recommended)
+    encrypt        = true        # Encrypt state file at rest (recommended)
     #dynamodb_table = "terraform-lock-table" # Optional: For state locking
   }
 }
