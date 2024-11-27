@@ -26,7 +26,7 @@ terraform {
 
 ###########################################
 # Data source to fetch the S3 bucket object (zip file)
-data "aws3_bucket_object" "lambda_zip" {
+data "aws_s3_bucket_object" "lambda_zip" {
   bucket = "tftest8"
   key = "test/lambda-function.zip"
 }
