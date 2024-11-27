@@ -36,11 +36,11 @@ resource "aws_lambda_function" "example_lambda" {
   function_name = "example-lambda-function"
   
   # Use the S3 object as the source
-  s3_bucket = data.aws3_bucket_object.lambda_zip.bucket
-  s3_key = data.aws3_bucket_object.lambda_zip.key
+  s3_bucket = data.aws_s3_bucket_object.lambda_function.bucket
+  s3_key = data.aws_s3_bucket_object.lambda-function.key
   
   # Alternatively, you can use source_code_hash for change detection
-  source_code_hash = data.aws3_bucket_object.lambda_zip.etag
+  source_code_hash = data.aws_s3_bucket_object.lambda_function.etag
   
   handler = "index.handler" # Replace with your handler
   runtime = "nodejs18.x" # Replace with your runtime
