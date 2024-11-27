@@ -3,6 +3,27 @@
 provider "aws" {
   region = "us-east-1" # Replace with your desired region
 }
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+  
+  backend "s3" {
+    bucket         = "tftest8"
+    key            = "path/test/terraform.tfstate" # Path to the state file in the bucket
+    region         = "us-east-1" # Replace with your bucket's region
+    #encrypt        = true        # Encrypt state file at rest (recommended)
+    #dynamodb_table = "terraform-lock-table" # Optional: For state locking
+  }
+}
+
+
+
+###########################################
 # Data source to fetch the S3 bucket object (zip file)
 data "aws3_bucket_object" "lambda_zip" {
   bucket = "tftest8"
