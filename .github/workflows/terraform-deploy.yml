@@ -61,11 +61,6 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: Configure git
-        run: |
-          git config --global url."https://token:${{ secrets.org_repos_internal_read_only }}@github.com/bayer-int".insteadOf https://github.com/bayer-int
-          git config --global init.defaultBranch main
-
       - name: Configure AWS Credentials
         if:  ${{ env.AWS_OIDC_ASSUME_ROLE }}
         uses: aws-actions/configure-aws-credentials@v4
