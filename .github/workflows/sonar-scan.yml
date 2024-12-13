@@ -1,0 +1,113 @@
+workflows:name: SonarQube Quality Scanner
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "The environment to run the scan"
+        required: true
+        type: string
+      working_dir:
+        description: "The working directory (Frontend, Backend, or Terraform)"
+        required: true
+        type: string
+
+
+    secrets:
+      org_repos_internal_read_only:
+        required: false
+      SONAR_TOKEN_BACKEND:
+        required: true
+      SONAR_TOKEN_FRONTEND:
+        required: true
+      SONAR_TOKEN_TERRAFORM:
+        required: true
+
+env:
+  SONAR_HOST_URL: https://sonar.cloud.bayer.com
+ 
+jobs:
+  SonarQube-Scan:
+    name: Run SonarQube
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set Up Python for Backend
+        if: ${{ inputs.working_dir == './backend' }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Poetry
+        if: ${{ inputs.working_dir == './backend' }}
+        run: |
+          python -m pip install --upgrade poetry
+          poetry install || (poetry lock && poetry install)
+          chmod +x ./export-deps.sh
+          ./export-deps.sh
+          pip install -r requirements.txt
+        working-directory: ./backend
+
+      - name: Run Tests
+        if: ${{ inputs.working_dir == './backend' }}
+        run: |
+         mkdir -p backend-results
+         poetry run pytest -v -s tests_api.py > "backend-results/backend-results_${{ github.run_id }}.txt" 2>&1
+        working-directory: ./backend
+ 
+      - name: Upload Test Results
+        if: ${{ inputs.working_dir == './backend' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-unittest-results
+          path: ./backend/backend-results/backend-results_${{ github.run_id }}.txt
+
+
+      # Unittest for Frontend
+      - name: Set Up Node.js for Frontend
+        if: ${{ inputs.working_dir == './frontend' }}
+        uses: actions/setup-node@v3
+        with:
+          working-directory: ${{ inputs.working_dir }}
+          node-version: '20.x'
+
+      - name: Install Dependencies and Run Tests for Frontend
+        if: ${{ inputs.working_dir == './frontend' }}
+        working-directory: ./frontend
+        run: |
+          mkdir -p frontend-results
+          npm install
+          npm run test -- --code-coverage --watch=false > "frontend-results/frontend-results_${{ github.run_id }}.txt" 2>&1 || true
+         
+      - name: Upload Frontend Test Results
+        if: ${{ inputs.working_dir == './frontend' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-unittest-results
+          path: ./frontend/frontend-results/frontend-results_${{ github.run_id }}.txt
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        with:
+          projectBaseDir: ${{ inputs.working_dir }}
+        env:
+          SONAR_TOKEN: ${{
+            inputs.working_dir == './backend' && secrets.SONAR_TOKEN_BACKEND ||
+            inputs.working_dir == './frontend' && secrets.SONAR_TOKEN_FRONTEND ||
+            inputs.working_dir == './platforms' && secrets.SONAR_TOKEN_TERRAFORM
+           }}
+
+      - name: SonarQube Quality Gate Check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        with:
+          scanMetadataReportFile: ${{ inputs.working_dir }}/.scannerwork/report-task.txt
+        env:
+          SONAR_TOKEN: ${{
+            inputs.working_dir == './backend' && secrets.SONAR_TOKEN_BACKEND ||
+            inputs.working_dir == './frontend' && secrets.SONAR_TOKEN_FRONTEND ||
+            inputs.working_dir == './platforms' && secrets.SONAR_TOKEN_TERRAFORM
+
+           }}
