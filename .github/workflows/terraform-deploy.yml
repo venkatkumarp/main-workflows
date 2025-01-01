@@ -97,3 +97,7 @@ jobs:
       - name: terraform apply
         if: ${{ !inputs.plan_only }}
         run: terraform -chdir=${{ inputs.working_dir }} apply -auto-approve -input=false
+        
+      - name: terraform destroy
+        if: ${{ inputs.destroy }}
+        run: terraform -chdir=${{ inputs.working_dir }} destroy -auto-approve -input=false
